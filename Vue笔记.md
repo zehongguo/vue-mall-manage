@@ -143,4 +143,13 @@
 
    2.  在需要使用的地方使用`      <el-button>el-button</el-button>`
 
-   
+
+#### 登录模块
+
+**登录逻辑图**
+
+![](./images/loginToken.png)
+
+**git新建login分支**
+
+`git checkout -b login`新建登录子分支
