@@ -140,9 +140,29 @@
 2. 使用
 
    1. 在plugins.js中引入需要的组件
+2.  在需要使用的地方使用`      <el-button>el-button</el-button>`
+   
 
-   2.  在需要使用的地方使用`      <el-button>el-button</el-button>`
+**使用sass**
 
+1. ` npm install sass-loader --save-dev`
+
+2. `npm install node-sass --save-dev`
+
+3. 使用
+
+   ```css
+   <style lang="scss" scoped>
+   .login {
+     background-color: blue;
+     h1 {
+       color: hsl(0, 0%, 95%);
+     }
+   }
+   </style>
+   ```
+
+   
 
 #### 登录模块
 
@@ -153,3 +173,80 @@
 **git新建login分支**
 
 `git checkout -b login`新建登录子分支
+
+`git branch` 查看分支情况
+
+**新建登录页面,并配置登录路由**
+
+1. 新建登录页面
+
+   注意点
+
+   1. 使用elementui表单时，`<el-input v-model=".." ></el-input>`,要是用`v-model`而不是使用`:model`
+
+   2. 使用sessionStorage来储存token
+
+      `window.sessionStorage.setItem('token',data.token);`
+
+   3. 代码跳转并携带参数
+
+      ```js
+      // 路由跳转
+      this.$router.push({
+        path:"/home",
+        query:{
+        data,
+        username:111
+        }
+      })
+      ```
+
+   4. 在前置路由守卫配置，如果没有token则跳转到登录页面
+
+      ```js
+      router.beforeEach((to,from,next) => {
+          // 判断请求路径是否是login
+          if(to.path == "/login"){
+            next();
+          }else{
+            // 查看有没有token,如果有则跳转继续跳转，如果没有则跳转到login
+            window.sessionStorage.getItem("token") != null ? next() : next('/login');
+          }
+      });
+      ```
+
+   5. 监听路由变化，用于提示用户还未登录
+
+      ```js
+       watch: {
+          $route: {
+            handler: function(val){
+              val.query.status && this.$message({message: '请先登录',
+                  type: 'warning'});
+            },
+          } 
+        }, 
+      ```
+
+      
+
+2. 配置路由
+
+   ```js
+   const Login = () => import('../views/login/Login.vue');
+   const routes = [{
+     path: '/',//访问根目录时跳转到登录页面
+     redirect: '/login'
+   }, {
+     path: "/home",
+     component: HelloWorld
+   }, {
+     path: '/login',
+     component: Login
+   }];
+   ```
+
+   
+
+
+
