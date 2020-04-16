@@ -1,10 +1,12 @@
-import {request} from './request';
+import {
+  request
+} from './request';
 
 
 export function toLogin(username, password) {
   return request({
     url: '/login',
-    type:'GET',
+    method: 'GET',
     params: {
       username,
       password

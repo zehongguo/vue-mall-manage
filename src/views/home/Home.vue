@@ -1,27 +1,23 @@
 <template>
-  <div class='Home'>
-      <h1>这里是主页</h1>
-  </div>
+  <frame />
 </template>
 
 <script>
+// import SideBar from "./sidebar/SideBar.vue";
+import Frame from "components/frame/Frame.vue";
 export default {
-  name:'Home',
+  name: "Home",
   data() {
-    return {
-
-    }
+    return {};
   },
-  methods: {
+  methods: {},
+  created() {},
 
-  },
   components: {
-
-  },
-  
-}
+    Frame
+  }
+};
 </script>
 
-<style lang='scss' scoped>
-
+<style lang="scss" scoped>
 </style>

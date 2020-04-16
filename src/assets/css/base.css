@@ -1,1 +1,9 @@
 @import "./normalize.css";
+
+.el-breadcrumb {
+  margin-bottom: 20px;
+}
+
+.el-pagination {
+  margin-top: 15px;
+}

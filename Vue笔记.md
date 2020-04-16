@@ -1,4 +1,4 @@
-# Vue商城管理实战
+# Vue+elementui商城管理实战
 
 ### 项目前准备
 
@@ -113,7 +113,10 @@
      });
    
      // 拦截发送请求
+     
      instance.interceptors.request.use(config => {
+       // 每个请求都发送token
+      config.headers.Authorization = 		window.sessionStorage.getItem("token");
        return config;
      }, err => {
        console.log('发送请求失败' + err);
@@ -129,6 +132,21 @@
      return instance(config);
    }
    ```
+   
+3. 使用
+
+   ```js
+   export function toLogin(username, password) {
+     return request({
+       url: '/login',
+       method: 'GET',
+       params: {
+         username,
+         password
+       }
+     });
+   }
+   ```
 
 **引入elementUI**
 
@@ -141,7 +159,7 @@
 
    1. 在plugins.js中引入需要的组件
 2.  在需要使用的地方使用`      <el-button>el-button</el-button>`
-   
+  
 
 **使用sass**
 
@@ -225,10 +243,8 @@
                   type: 'warning'});
             },
           } 
-        }, 
+        },
       ```
-
-      
 
 2. 配置路由
 
@@ -246,7 +262,166 @@
    }];
    ```
 
-   
+3. 合并分支并提交代码
+
+   1. `git add .`
+   2. `git commit -m "完成登录模块"`
+   3. `git checkout master ` 切换为主分支
+   4. `git merge login` 合并login分支
+   5. `git push origin master` 推送到云端
+
+#### 主页
+
+1. 侧边栏
+   + 需要注意将menu的样式设为`border-right:none`
+
+
+
+#### 用户列表
+
++ 使用el-table注意事项
+
+  ```js
+  <el-table :data="userListData" border style="width: 100%">
+            <el-table-column type="index"></el-table-column>
+            <el-table-column prop="username" label="姓名"></el-table-column>
+            <el-table-column prop="email" label="邮箱"></el-table-column>
+            <el-table-column prop="mobile" label="电话号码"></el-table-column>
+            <el-table-column prop="role_name" label="角色"></el-table-column>
+            <el-table-column prop="mg_state" label="状态">
+              <template slot-scope="scope">
+                <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ccc"></el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作"></el-table-column>
+          </el-table>
+  ```
+
+  渲染模板使用作用域插槽来获取当行的数据
+
+  ```js
+  <template slot-scope="scope">
+                <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ccc"></el-switch>
+  </template>
+  ```
+
++ 当Dialog为子组件时，由父组件触发Dialog，子组件的visible要这样写
+
+  ```vue
+  // 父组件
+  <add-dialog :dialogVisible.sync="addDialogVisible" />
+  
+  // 子组件
+  // 这里的compDialogVisible需要注意
+  <el-dialog title="添加用户" :visible.sync="compDialogVisible" width="30%">
+        <div>这是一段信息</div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogClose ">取 消</el-button>
+          <el-button type="primary" @click="dialogClose">确 定</el-button>
+        </span>
+  </el-dialog>
+  computed: {
+      compDialogVisible: {
+        get() {
+          return this.dialogVisible;
+        },
+        set() {
+          this.dialogClose();
+        }
+      }
+  },
+  methods: {
+      dialogClose() {
+        this.$emit("update:dialogVisible", false);
+      }
+  },
+  ```
+
++ .sync用法
+
+  一个组件上只能定义一个v-model，如果其他prop也要实现双向绑定的效果该怎么办呢？ 简单的方法是子组件向父组件发送一个事件，父组件监听该事件，然后更新prop。具体如下：
+
+  ```vue
+  // info.vue组件定义了一个value 属性， 和一个valueChanged事件
+  <template>
+      <div>
+          <input @input="onInput" :value="value"/>
+      </div>
+  </template>
+  
+  <script>
+  export default {
+      props: {
+          value: {
+              type: String
+          }
+      },
+      methods: {
+          onInput(e) {
+              this.$emit("valueChanged", e.target.value)
+          }
+      }
+  }
+  </script>
+  ```
+
+  父组件index.vue
+
+  ```vue
+  <template>
+      <info :value="myValue" @valueChanged="e => myValue = e"></info>
+  </template>
+  
+  <script>
+      inport info from './info.vue';
+      export default {
+          components: {
+              info,
+          },
+          data() {
+              return {
+                  myValue: 1234,
+              }
+          },
+      }
+  </script>
+  ```
+
+  上述写法太麻烦了，通过.sync可以简化上面代码，只需要修两个地方：
+
+  1. 组件内触发的事件名称以“update:myPropName”命名，相应的上述info组件改为 update:value
+  2. 父组件v-bind:value 加上.sync修饰符，即 v-bind:value.sync
+     这样父组件就不用再手动绑定@update:value事件了。
+
+  #### 用法1: v-bind:prop.sync="propvalue"
+
+  ```vue
+  // info.vue组件
+  ...
+  methods: {
+      onInput(e) {
+          this.$emit("update:value", e.target.value)
+      }
+  }
+  // index.vue组件
+  <info :value.sync="myValue"></info>
+  ```
+
++ 添加用户时,axios的参数要使用data,params参数会在url上,query
+
+  ```js
+  export function addUser(userInfo) {
+  
+    return request({
+      method: "POST",
+      url: '/users',
+      // 这里不是params
+      data: userInfo
+    });
+  }
+  ```
+
+  
 
 
 

@@ -13,7 +13,11 @@
             class="form-input"
           ></el-input>
         </el-form-item>
-        <el-button @click="submitForm" type="primary">登录</el-button>
+        <el-button
+          @click="submitForm"
+          type="primary"
+          v-loading.fullscreen.lock="fullscreenLoading"
+        >登录</el-button>
         <el-button type="info" @click="resetForm">重置</el-button>
       </el-form>
     </div>
@@ -32,14 +36,15 @@ export default {
       },
       rules: {
         username: [
-          { required: true, message: "请输入账号密码", trigger: "blur" },
+          { required: true, message: "请输入账号", trigger: "blur" },
           { min: 3, max: 10, message: "长度在 3 到 10 个字符", trigger: "blur" }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
           { min: 6, max: 10, message: "长度在 6 到 10 个字符", trigger: "blur" }
         ]
-      }
+      },
+      fullscreenLoading: false
     };
   },
   methods: {
@@ -49,29 +54,36 @@ export default {
         if (!valid) {
           return;
         }
-        // 发送请求并获取数据
-        const { data, meta } = await toLogin(
-          this.loginForm.username,
-          this.loginForm.password
-        );
-        if (meta.status == 200) {
-          this.$message({
-            message: `登录成功,欢迎${data.username}到来`,
-            type: "success"
-          });
+        try {
+          // 发送请求并获取数据
+          this.fullscreenLoading = true;
+          const { data, meta } = await toLogin(
+            this.loginForm.username,
+            this.loginForm.password
+          );
+          if (meta.status == 200) {
+            this.$message({
+              message: `登录成功,欢迎${data.username}到来`,
+              type: "success"
+            });
 
-          // 将token储存到浏览器
-          window.sessionStorage.setItem("token", data.token);
+            // 将token储存到浏览器
+            window.sessionStorage.setItem("token", data.token);
 
-          // 路由跳转
-          this.$router.push({
-            path: "/home",
-            query: {
-              data
-            }
-          });
-        } else {
-          this.$message.error("登录失败," + meta.msg);
+            // 路由跳转
+            this.$router.push({
+              path: "/home",
+              query: {
+                data
+              }
+            });
+          } else {
+            this.$message.error("登录失败," + meta.msg);
+          }
+        } catch (error) {
+          this.$message.error("网络请求超时");
+        } finally {
+          this.fullscreenLoading = false;
         }
       });
     },
@@ -81,15 +93,6 @@ export default {
     }
   },
 
-  // 监听路由变化，如果非法访问，提示先登录
-  watch: {
-    $route: {
-      handler: function(val) {
-        val.query.status &&
-          this.$message({ message: "请先登录", type: "warning" });
-      }
-    }
-  },
   components: {}
 };
 </script>
