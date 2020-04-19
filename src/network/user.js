@@ -3,6 +3,7 @@ import {
 } from './request';
 
 
+// 获取用户列表
 export function getUserList(queryInfo) {
   return request({
     method: "GET",
@@ -11,6 +12,7 @@ export function getUserList(queryInfo) {
   });
 }
 
+// 更新用户状态
 export function updateState(uid, state) {
   return request({
     method: "PUT",
@@ -18,6 +20,7 @@ export function updateState(uid, state) {
   });
 }
 
+//新增用户
 export function addUser(userInfo) {
 
   return request({
@@ -27,6 +30,7 @@ export function addUser(userInfo) {
   });
 }
 
+// 根据id删除用户
 export function deleteUserById(uid) {
 
   return request({
@@ -35,6 +39,7 @@ export function deleteUserById(uid) {
   });
 }
 
+// 根据用户id获取用户详情信息
 export function getDetailById(uid) {
 
   return request({
@@ -43,6 +48,7 @@ export function getDetailById(uid) {
   });
 }
 
+// 根据用户ID编辑用户信息
 export function editUserById(uid, email, mobile) {
   return request({
     method: "PUT",
@@ -50,6 +56,18 @@ export function editUserById(uid, email, mobile) {
     data: {
       email,
       mobile
+    }
+  });
+}
+
+// 给用户分配新角色
+
+export function distriNewRole(userId, rid) {
+  return request({
+    url: `/users/${userId}/role`,
+    method: 'PUT',
+    data: {
+      rid
     }
   });
 }

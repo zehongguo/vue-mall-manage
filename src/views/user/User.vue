@@ -1,11 +1,7 @@
 <template>
   <div class="user">
     <!--面包屑-->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{path: '/home'}">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    <crumbs :crumbsArr="['用户管理','用户列表']" />
     <el-card class="box-card">
       <!--搜索-->
       <div slot="header" class="clearfix">
@@ -43,7 +39,7 @@
               ></el-switch>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="200px">
             <template slot-scope="scope">
               <el-button
                 type="primary"
@@ -60,7 +56,13 @@
                 @click="deleteUser(scope.row.id)"
               ></el-button>
               <el-tooltip effect="dark" content="分配角色" :enterable="false" placement="top">
-                <el-button type="warning" size="mini" icon="el-icon-s-custom" circle></el-button>
+                <el-button
+                  type="warning"
+                  size="mini"
+                  icon="el-icon-s-custom"
+                  @click="openNewRoleDialog(scope.row)"
+                  circle
+                ></el-button>
               </el-tooltip>
             </template>
           </el-table-column>
@@ -84,6 +86,11 @@
       @editUserSuccess="getUserListInfoUser"
       :editId="editId"
     />
+    <new-role-dialog
+      :dialogVisible.sync="newRoleDialogVisible"
+      :currentUser.sync="currentUser"
+      @newRoleSuccess="getUserListInfoUser"
+    />
   </div>
 </template>
 
@@ -92,6 +99,8 @@ import { getUserList, updateState, deleteUserById } from "network/user.js";
 
 import AddDialog from "./ChildrenComp/AddDialog";
 import EditDialog from "./ChildrenComp/EditDialog";
+import NewRoleDialog from "./ChildrenComp/NewRoleDialog";
+import Crumbs from "components/crumbs/Crumbs";
 export default {
   name: "User",
   data() {
@@ -115,8 +124,12 @@ export default {
       addDialogVisible: false,
       // 显示编辑框
       editDialogVisible: false,
-
-      editId: 0
+      // 显示分配角色框
+      newRoleDialogVisible: false,
+      // 需要修改的id
+      editId: 0,
+      // 选中需要分配角色的信息
+      currentUser: {}
     };
   },
   created() {
@@ -186,11 +199,19 @@ export default {
     showEditDialog(uid) {
       this.editDialogVisible = true;
       this.editId = uid;
+    },
+
+    // 显示分配角色对话框
+    openNewRoleDialog(user) {
+      this.currentUser = user;
+      this.newRoleDialogVisible = true;
     }
   },
   components: {
     AddDialog,
-    EditDialog
+    EditDialog,
+    NewRoleDialog,
+    Crumbs
   }
 };
 </script>

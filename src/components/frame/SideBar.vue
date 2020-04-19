@@ -20,7 +20,7 @@
           <i :class="iconfonts[index]"></i>
           <span>{{ item.authName }}</span>
         </template>
-        <el-menu-item v-for="subItem in item.children" :key="subItem.id" :index="'/'+item.path">
+        <el-menu-item v-for="subItem in item.children" :key="subItem.id" :index="'/'+subItem.path">
           <template slot="title">
             <i class="el-icon-menu"></i>
             <span>{{ subItem.authName }}</span>
@@ -55,6 +55,7 @@ export default {
         return;
       }
       this.menusData = data;
+      // console.log(data);
     },
     toCollapse() {
       this.isCollapse = !this.isCollapse;

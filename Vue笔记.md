@@ -421,7 +421,144 @@
   }
   ```
 
++ el 表单自定义验证规则
+
+  ```js
+  data(){
+  	let checkEmail = (rule, value, callback) => {
+        // eslint-disable-next-line no-useless-escape
+        let myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+        if (myreg.test(value)) {
+          callback();
+        } else {
+          callback(new Error("输入邮箱不符合规则"));
+        }
+      };
+    return {
+      userRules:{
+        email: [
+            { required: true, message: "请输入邮箱", trigger: "blur" },
+            { validator: checkEmail, trigger: "blur" }
+          ],
+      }
+    }
+  }
   
+  ```
+
+  
+
++ 搜索逻辑
+
+  搜索接口参数
+
+  ```js
+   queryInfo: {
+     // 搜索参数
+     query: "",
+     // 当前页面
+     pagenum: 1,
+     // 一页显示多少条
+     pagesize: 5
+  },
+  ```
+
+  页面代码
+
+  ```vue
+   <el-input
+             placeholder="输入搜索内容"
+             @clear="getUserListInfoUser" <!--清除内容时重新请求数据，展示所有数据-->
+             v-model="queryInfo.query" <!--搜索框绑定请求参数-->
+             clearable
+             >
+     <el-button slot="append" @click="search" icon="el-icon-search"></el-button>
+  </el-input>
+  ```
+
+  搜索按钮
+
+  ```js
+   // 重置pagenum为1
+   this.queryInfo.pagenum = 1;
+   this.getUserListInfoUser();
+  ```
+
+
+
+
+#### 权限页
+
+1. 用户-角色-权限图
+
+   > 用户对应角色，拥有这个角色就拥有角色下的权限
+
+   ![](./images/power.png)
+
+2. 权限列表等级展示
+
+   v-if与v-show比较，如果元素切换频率频繁则使用v-show，否则使用v-if
+
+3. 角色页
+
+   使用computed传参数时应使用闭包
+
+   当v-for与v-if需要同时使用时，应使用computed过滤掉不需要的子项
+
+   ```js
+     computed: {
+       haveRightChildren() {
+         return function(rightsChildren) {
+           rightsChildren = rightsChildren.filter(
+             item => item.children.length !== 0
+           );
+           return rightsChildren;
+         };
+       }
+     },
+   ```
+
+   ```js
+   v-for="item in haveRightChildren(scope.row.children) "
+   ```
+
+4. 使用tree组件默认选中已分配的权限，使用递归向数组push已勾选的id值，**数据修改，但视图为发生改变**
+
+   ```vue
+       <el-tree
+         :data="rightsTreeData"
+         show-checkbox
+         :props="defaultProps"
+         default-expand-all
+         node-key="id"
+         ref="treeRightsRef"
+         :default-checked-keys="checkedKeys"
+       />
+   //:default-checked-keys是默认选中的id数组
+   ```
+
+   ```js
+   		//对话框打开时，获取已选中的id值赋值给checkedKeys,但是不知道为什么要这么做才能响应
+   		//而this.getCheckedKeys(this.currentRole, this.checkedKeys);这样没有响应
+   		dialogOpen() {
+         // TODO:为什么要这样赋值才有响应
+         let arr = [];
+         this.getCheckedKeys(this.currentRole, arr);
+         this.checkedKeys = arr;
+       },
+   	// 获取已经选中的权限
+       getCheckedKeys(node, arr) {
+         if (!node.children) {
+           return arr.push(node.id);
+         }
+   
+         node.children.forEach(item => {
+           this.getCheckedKeys(item, arr);
+         });
+       },
+   ```
+
+   
 
 
 
