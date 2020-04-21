@@ -55,9 +55,19 @@
             </template>
           </el-table-column>
           <el-table-column label="操作" width="240px">
-            <template>
-              <el-button type="primary" size="mini" icon="el-icon-edit">编辑</el-button>
-              <el-button type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                size="mini"
+                icon="el-icon-edit"
+                @click="openEditDialog(scope.row)"
+              >编辑</el-button>
+              <el-button
+                type="danger"
+                size="mini"
+                icon="el-icon-delete"
+                @click="deleteCateByIdInCate(scope.row)"
+              >删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -74,13 +84,35 @@
       </div>
     </el-card>
     <add-cate-dialog :dialogVisible.sync="isShowAddDialog" @addCategorySuccess="getCategories" />
+    <el-dialog
+      title="编辑分类"
+      :visible.sync="isShowEditDialog"
+      width="30%"
+      @close="$refs.editCateruleForm.resetFields();"
+    >
+      <el-form
+        :model="editCateData"
+        :rules="editCateRules"
+        ref="editCateruleForm"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
+        <el-form-item label="活动名称" prop="cat_name">
+          <el-input v-model="editCateData.cat_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isShowEditDialog = false">取 消</el-button>
+        <el-button type="primary" @click="submitEditCate">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Crumbs from "components/crumbs/Crumbs";
 import AddCateDialog from "./chilrenComp/AddCateDialog";
-import { getCategories } from "network/goods.js";
+import { getCategories, deleteCateById, editCategory } from "network/goods.js";
 export default {
   name: "Categories",
   data() {
@@ -95,7 +127,15 @@ export default {
       //是否选择展开行，如果展开商品分类表头变为全部收缩
       isExpanded: false,
       categoriesData: [],
-      isShowAddDialog: false
+      isShowAddDialog: false,
+      isShowEditDialog: false,
+      editCateData: {
+        cat_id: 0,
+        cat_name: ""
+      },
+      editCateRules: {
+        cat_name: [{ required: true, message: "请输入分类名", trigger: "blur" }]
+      }
     };
   },
   created() {
@@ -110,6 +150,47 @@ export default {
       this.categoriesData = data.result;
       this.total = data.total;
       console.log(this.categoriesData);
+    },
+    // 删除分类
+    deleteCateByIdInCate({ cat_id }) {
+      console.log(cat_id);
+      this.$confirm("确定删除该分类吗, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const { meta } = await deleteCateById(cat_id);
+          if (meta.status !== 200) {
+            return this.$message.error("删除失败" + meta.msg);
+          }
+          this.$message.success("删除成功");
+          this.getCategories();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
+    openEditDialog(cateObj) {
+      this.isShowEditDialog = true;
+      this.editCateData.cat_id = cateObj.cat_id;
+      this.editCateData.cat_name = cateObj.cat_name;
+    },
+    submitEditCate() {
+      this.$refs.editCateruleForm.validate(async valid => {
+        if (!valid) {
+          return;
+        }
+        const { meta } = await editCategory(this.editCateData);
+        if (meta.status !== 200)
+          return this.$message.error("编辑失败," + meta.msg);
+        this.getCategories();
+        this.$message.success("修改成功");
+        this.isShowEditDialog = false;
+      });
     },
     //全部展开
     expandAll() {

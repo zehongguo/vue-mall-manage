@@ -17,3 +17,23 @@ export function addCategory(cateData) {
     data: cateData
   });
 }
+
+export function deleteCateById(id) {
+  return request({
+    url: `/categories/${id}`,
+    method: "DELETE",
+  });
+}
+
+export function editCategory({
+  cat_id,
+  cat_name
+}) {
+  return request({
+    url: `/categories/${cat_id}`,
+    method: "PUT",
+    data: {
+      cat_name
+    }
+  });
+}
