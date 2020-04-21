@@ -29,7 +29,7 @@
           <el-table-column prop="email" label="邮箱"></el-table-column>
           <el-table-column prop="mobile" label="电话号码"></el-table-column>
           <el-table-column prop="role_name" label="角色"></el-table-column>
-          <el-table-column prop="mg_state" label="状态">
+          <el-table-column label="状态">
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.mg_state"

@@ -558,7 +558,59 @@
        },
    ```
 
-   
+
+
+### 商品
+
+#### 商品分类
+
+elementui的树形表格属性expand-row-keys为数组，里面为需要展开的key值**为字符串**
+
+```vue
+<el-table
+          v-loading="isLoading"
+          :data="categoriesData"
+          style="width: 100%;margin-bottom: 20px;"
+          row-key="cat_id"
+          border
+          :indent="20"
+          expand-row-keys="['70']" <!--默认展开key值为70的那一行，虽然cat_id为数字，但是这里还是要写为字符串-->
+          :tree-props="{children: 'children'}"
+    			>
+```
+
+elementui树形表格全部展开或收缩
+
+```js
+		// 全部收缩
+    shrinkAll() {
+      this.forArr(this.categoriesData, false);
+    },
+    expandAll() {
+ 			 this.forArr(this.tableData, true)
+		},
+    // 全部展开或全部收缩
+    forArr(arr, isExpand) {
+      arr.forEach(i => {
+        this.$refs.theTable.toggleRowExpansion(i, isExpand);
+        if (i.children) {
+          this.forArr(i.children, isExpand);
+        }
+      });
+    }
+```
+
+elementui级联选择器高度过高，添加全局样式
+
+```css
+.el-cascader-menu {
+  height: 300px;
+}
+```
+
+
+
+
 
 
 
