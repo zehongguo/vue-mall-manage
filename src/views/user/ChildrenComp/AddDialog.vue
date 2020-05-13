@@ -1,11 +1,5 @@
 <template>
-  <el-dialog
-    title="添加用户"
-    :visible.sync="compDialogVisible"
-    width="40%"
-    @close="$refs.addUserFormRef.resetFields();"
-    :destroy-on-close="true"
-  >
+  <el-dialog title="添加用户" :visible.sync="compDialogVisible" width="40%" :destroy-on-close="true">
     <el-form ref="addUserFormRef" label-width="70px" :model="userForm" :rules="userRules">
       <el-form-item label="用户名" prop="username">
         <el-input v-model="userForm.username" clearable></el-input>
@@ -98,6 +92,7 @@ export default {
   },
   methods: {
     dialogClose() {
+      this.$refs.addUserFormRef.resetFields();
       this.$emit("update:dialogVisible", false);
     },
     submitUserForm() {

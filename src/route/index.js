@@ -12,6 +12,7 @@ const User = () => import('views/user/User.vue');
 const Authority = () => import('views/authority/Authority.vue');
 const Role = () => import('views/authority/role/Role.vue');
 const GoodsCategories = () => import('views/goods/goodsCatrgories/Categories.vue');
+const GoodsParam = () => import('views/goods/goodsParam/Param.vue');
 
 Vue.use(VueRouter);
 
@@ -40,6 +41,9 @@ const routes = [{
   }, {
     path: "/categories",
     component: GoodsCategories
+  }, {
+    path: "/params",
+    component: GoodsParam
   }]
 }];
 const router = new VueRouter({

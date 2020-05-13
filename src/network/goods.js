@@ -37,3 +37,40 @@ export function editCategory({
     }
   });
 }
+//获取分类参数 
+export function getCatePamramList(id, sel) {
+  return request({
+    url: `categories/${id}/attributes`,
+    method: "GET",
+    params: {
+      sel
+    }
+  });
+}
+
+// 根据分类id与分类对象添加分类参数
+export function addParam(id, paramData) {
+  return request({
+    url: `categories/${id}/attributes`,
+    method: 'POST',
+    data: paramData
+  });
+}
+
+// 编辑分类参数
+export function editParamById(id, attrId, paramData) {
+  return request({
+    url: `categories/${id}/attributes/${attrId}`,
+    method: "PUT",
+    data: paramData
+  });
+
+}
+
+//根据参数Id删除参数
+export function deleteParamById(id, attrid) {
+  return request({
+    url: `categories/${id}/attributes/${attrid}`,
+    method: "DELETE",
+  });
+}

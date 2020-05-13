@@ -111,7 +111,7 @@
 
 <script>
 import Crumbs from "components/crumbs/Crumbs";
-import AddCateDialog from "./chilrenComp/AddCateDialog";
+import AddCateDialog from "./childrenComp/AddCateDialog";
 import { getCategories, deleteCateById, editCategory } from "network/goods.js";
 export default {
   name: "Categories",
@@ -149,11 +149,9 @@ export default {
       if (meta.status !== 200) return this.$message.error("获取数据失败");
       this.categoriesData = data.result;
       this.total = data.total;
-      console.log(this.categoriesData);
     },
     // 删除分类
     deleteCateByIdInCate({ cat_id }) {
-      console.log(cat_id);
       this.$confirm("确定删除该分类吗, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
