@@ -610,9 +610,55 @@ elementui级联选择器高度过高，添加全局样式
 
 #### 参数管理
 
+无大问题
 
+#### 商品列表
 
++ 全局过滤器
 
+  ```js
+  // 全局过滤器,在main.js定义
+  Vue.filter("dataFormat", (originVal) => {
+    const dt = new Date(originVal);//这个方法时间戳必须是14位的如果是11位则需要*1000
+    let y = dt.getFullYear();
+    let m = (dt.getMonth() + 1 + "").padStart(2, "0")
+    let d = (dt.getDay() + "").padStart(2, "0")
+    let hh = (dt.getHours() + "").padStart(2, "0")
+    let mm = (dt.getMinutes() + "").padStart(2, "0")
+    let ss = (dt.getSeconds() + "").padStart(2, "0")
+    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+  })
+  // 使用
+  {{scope.row.add_time | dataFormat }}
+  ```
 
++ 父组件样式scoped样式无法应用到子组件，使用`父组件选择器/deep/子组件选择器`例如
 
+  ```css
+  .my-editor /deep/ .ql-container {
+    height: 300px;
+  }
+  ```
 
++ vue-quill-editor富文本编辑器的使用
+
+  ```js
+  // 全局挂载
+  import VueQuillEditor from 'vue-quill-editor'
+  import 'quill/dist/quill.core.css'
+  import 'quill/dist/quill.snow.css'
+  import 'quill/dist/quill.bubble.css'
+  
+  Vue.use(VueQuillEditor)
+  ```
+
+  ```js
+  // 双向绑定
+  <quill-editor
+  			v-model="addGoodsForm.goods_introduce"
+  			ref="myQuillEditor"
+  			class="my-editor">
+  </quill-editor>
+  ```
+
+  

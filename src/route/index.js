@@ -13,6 +13,9 @@ const Authority = () => import('views/authority/Authority.vue');
 const Role = () => import('views/authority/role/Role.vue');
 const GoodsCategories = () => import('views/goods/goodsCatrgories/Categories.vue');
 const GoodsParam = () => import('views/goods/goodsParam/Param.vue');
+const GoodsList = () => import("views/goods/goodsList/GoodsList.vue");
+const AddGoods = () => import("views/goods/goodsList/addGoods/AddGoods.vue")
+const Order = () => import("views/order/Order.vue")
 
 Vue.use(VueRouter);
 
@@ -44,6 +47,15 @@ const routes = [{
   }, {
     path: "/params",
     component: GoodsParam
+  }, {
+    path: "/goods",
+    component: GoodsList
+  }, {
+    path: "/addgoods",
+    component: AddGoods
+  }, {
+    path: "/orders",
+    component: Order
   }]
 }];
 const router = new VueRouter({

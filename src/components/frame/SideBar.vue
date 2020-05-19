@@ -1,7 +1,7 @@
 <template>
   <el-aside width="auto">
     <div class="toggel-button" @click="toCollapse">
-      <i :class="isCollapse ? 'el-icon-s-unfold':'el-icon-s-fold'"></i>
+      <i :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
     </div>
     <!--菜单-->
     <el-menu
@@ -12,15 +12,23 @@
       class="el-menu-vertical-demo"
       :collapse="isCollapse"
       :unique-opened="true"
-      :default-active="$route.path"
+      :default-active="$route.path === '/addgoods' ? '/goods' : $route.path"
       router
     >
-      <el-submenu v-for="(item, index) in menusData" :key="item.id" :index="index+1+''">
+      <el-submenu
+        v-for="(item, index) in menusData"
+        :key="item.id"
+        :index="index + 1 + ''"
+      >
         <template slot="title">
           <i :class="iconfonts[index]"></i>
           <span>{{ item.authName }}</span>
         </template>
-        <el-menu-item v-for="subItem in item.children" :key="subItem.id" :index="'/'+subItem.path">
+        <el-menu-item
+          v-for="subItem in item.children"
+          :key="subItem.id"
+          :index="'/' + subItem.path"
+        >
           <template slot="title">
             <i class="el-icon-menu"></i>
             <span>{{ subItem.authName }}</span>
@@ -31,41 +39,41 @@
   </el-aside>
 </template>
 <script>
-import { getMenuData } from "network/home.js";
+import { getMenuData } from 'network/home.js'
 export default {
-  name: "SideBar",
+  name: 'SideBar',
   data() {
     return {
       menusData: [],
       isCollapse: false,
       iconfonts: [
-        "el-icon-user-solid",
-        "el-icon-key",
-        "el-icon-s-goods",
-        "el-icon-s-order",
-        "el-icon-s-data"
-      ]
-    };
+        'el-icon-user-solid',
+        'el-icon-key',
+        'el-icon-s-goods',
+        'el-icon-s-order',
+        'el-icon-s-data',
+      ],
+    }
   },
   methods: {
     async getMenuDataInHome() {
-      const { data, meta } = await getMenuData();
-      if (meta.status != "200") {
-        this.$message.error("获取菜单列表失败!" + meta.msg);
-        return;
+      const { data, meta } = await getMenuData()
+      if (meta.status != '200') {
+        this.$message.error('获取菜单列表失败!' + meta.msg)
+        return
       }
-      this.menusData = data;
+      this.menusData = data
       // console.log(data);
     },
     toCollapse() {
-      this.isCollapse = !this.isCollapse;
-    }
+      this.isCollapse = !this.isCollapse
+    },
   },
   created() {
-    this.getMenuDataInHome();
+    this.getMenuDataInHome()
   },
-  components: {}
-};
+  components: {},
+}
 </script>
 
 <style lang="scss" scoped>

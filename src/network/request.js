@@ -8,7 +8,6 @@ export function request(config) {
     // baseURL: 'http://119.23.53.78:8888/api/private/v1/',
     baseURL: 'http://47.115.124.102:8888/api/private/v1',
     // baseURL: 'http://106.12.11.162:8888/api/private/v1/',
-
     timeout: 5000
   });
 

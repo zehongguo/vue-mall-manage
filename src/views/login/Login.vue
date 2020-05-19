@@ -1,24 +1,26 @@
 <template>
   <div class="login">
     <div class="login-box">
-      <el-form class="login-form" ref="loginFormRef" :model="loginForm" :rules="rules">
+      <el-form class="login-form"
+        ref="loginFormRef"
+        :model="loginForm"
+        :rules="rules">
         <el-form-item prop="username">
-          <el-input prefix-icon="el-icon-user" v-model="loginForm.username" class="form-input"></el-input>
+          <el-input prefix-icon="el-icon-user"
+            v-model="loginForm.username"
+            class="form-input"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input
-            type="password"
+          <el-input type="password"
             prefix-icon="el-icon-lock"
             v-model="loginForm.password"
-            class="form-input"
-          ></el-input>
+            class="form-input"></el-input>
         </el-form-item>
-        <el-button
-          @click="submitForm"
+        <el-button @click="submitForm"
           type="primary"
-          v-loading.fullscreen.lock="fullscreenLoading"
-        >登录</el-button>
-        <el-button type="info" @click="resetForm">重置</el-button>
+          v-loading.fullscreen.lock="fullscreenLoading">登录</el-button>
+        <el-button type="info"
+          @click="resetForm">重置</el-button>
       </el-form>
     </div>
   </div>
@@ -28,7 +30,7 @@
 import { toLogin } from "network/login";
 export default {
   name: "Login",
-  data() {
+  data () {
     return {
       loginForm: {
         username: "admin",
@@ -48,7 +50,7 @@ export default {
     };
   },
   methods: {
-    submitForm() {
+    submitForm () {
       // 预验证
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) {
@@ -88,7 +90,7 @@ export default {
       });
     },
     // 重置表单
-    resetForm() {
+    resetForm () {
       this.$refs.loginFormRef.resetFields();
     }
   },

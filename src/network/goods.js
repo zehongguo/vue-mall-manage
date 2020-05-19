@@ -48,6 +48,13 @@ export function getCatePamramList(id, sel) {
   });
 }
 
+export function getCategoryById(id) {
+  return request({
+    url: `categories/${id}`,
+    method: 'GET',
+  })
+}
+
 // 根据分类id与分类对象添加分类参数
 export function addParam(id, paramData) {
   return request({
@@ -74,3 +81,51 @@ export function deleteParamById(id, attrid) {
     method: "DELETE",
   });
 }
+
+// 获取商品列表
+export function getGoodsList(queryInfo) {
+  return request({
+    url: "goods",
+    method: "GET",
+    params: queryInfo
+  })
+}
+//根据Id删除商品
+export function deleteGoodsById(id) {
+  return request({
+    url: `goods/${id}`,
+    method: "DELETE",
+  });
+}
+
+export function addGoods(goods) {
+  return request({
+    url: "/goods",
+    method: "POST",
+    data: goods
+  })
+}
+
+export function getGoodsById(id) {
+  return request({
+    url: `/goods/${id}`,
+    method: "GET"
+  })
+}
+
+
+// export function uploadPic(file) {
+//   console.log(file);
+//   const formData = new FormData();
+//   formData.append("file", file);
+//   return request({
+//     url: "/upload",
+//     method: "POST",
+//     headers: {
+//       'Content-Type': 'multipart/form-data'
+//     },
+//     data: {
+//       file: formData
+//     }
+//   })
+// }

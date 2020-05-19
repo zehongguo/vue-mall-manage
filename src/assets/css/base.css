@@ -11,3 +11,7 @@
 .el-cascader-menu {
   height: 300px;
 }
+
+.el-step__title {
+  font-size: 14px !important;
+}
