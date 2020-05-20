@@ -66,10 +66,6 @@
               icon="el-icon-view"
               @click="showGoodsDetailDialog(scope.row)"
               circle></el-button>
-            <el-button type="primary"
-              size="mini"
-              icon="el-icon-edit"
-              circle></el-button>
             <el-button type="danger"
               size="mini"
               icon="el-icon-delete"
@@ -87,7 +83,7 @@
         :total="total">
       </el-pagination>
     </el-card>
-    <el-dialog title="提示"
+    <el-dialog title="商品详细"
       :visible.sync="dialogVisible"
       width="50%"
       @close="closeDetailDialog">

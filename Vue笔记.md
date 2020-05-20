@@ -661,4 +661,92 @@ elementui级联选择器高度过高，添加全局样式
   </quill-editor>
   ```
 
-  
+
+
+
+
+
+### 订单模块
+
+[省市区表级联动插件，配合级联选择器](https://github.com/iceyangcc/provinces-china)
+
+
+
+### 跳转进度条
+
+nprogress
+
++ 安装 `npm install nprogress -s`
+
++ 配置nprogress
+
+  + 方式1在发起请求时
+
+    ```js
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css'
+    // 在发起请求时开始
+     // 拦截发送请求
+      instance.interceptors.request.use(
+        (config) => {
+          NProgress.start()
+          // 头部信息添加token信息
+          config.headers.Authorization = window.sessionStorage.getItem('token')
+          return config
+        },
+        (err) => {
+          Message.error('发送请求失败')
+          console.log('发送请求失败' + err)
+        }
+      )
+    // 在响应时结束
+    instance.interceptors.response.use(
+        (res) => {
+          NProgress.done()
+          return res.data
+        },
+        (err) => {
+          Message.error('响应超时')
+          console.log('响应失败' + err)
+        }
+      )
+    ```
+
+  + 方式2，在路由跳转时
+
+    ```js
+    router.beforeEach((to, from, next) => {
+      NProgress.start()
+    });
+    router.afterEach(()=>{
+      NProgress.done()
+    })
+    ```
+
+### 项目优化
+
+1. 在build的时候移除所有的console.log
+
+   >  需要babel-plugin-transform-remove-console插件
+
+   + 安装`npm install babel-plugin-transform-remove-console --save-dev`
+
+   + 在babel.config.js文件夹的plugins数组增加`'babel-plugin-transform-remove-console'`
+
+     ```
+     "plugins": [
+         [
+           "component",
+           {
+             "libraryName": "element-ui",
+             "styleLibraryName": "theme-chalk"
+           }
+         ],
+         'babel-plugin-transform-remove-console'
+       ],
+     ```
+
+     
+
+
+

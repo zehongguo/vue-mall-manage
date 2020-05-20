@@ -4,6 +4,7 @@ import {
   Message
 } from 'element-ui';
 
+
 // const HellWorld = () => import('components/HelloWorld.vue');
 const Login = () => import('views/login/Login.vue');
 const Home = () => import('views/home/Home.vue');
@@ -16,7 +17,7 @@ const GoodsParam = () => import('views/goods/goodsParam/Param.vue');
 const GoodsList = () => import("views/goods/goodsList/GoodsList.vue");
 const AddGoods = () => import("views/goods/goodsList/addGoods/AddGoods.vue")
 const Order = () => import("views/order/Order.vue")
-
+const Report = () => import("views/report/Report.vue")
 Vue.use(VueRouter);
 
 const routes = [{
@@ -56,6 +57,9 @@ const routes = [{
   }, {
     path: "/orders",
     component: Order
+  }, {
+    path: "/reports",
+    component: Report
   }]
 }];
 const router = new VueRouter({
@@ -74,5 +78,6 @@ router.beforeEach((to, from, next) => {
     next('/login');
   }
 });
+
 
 export default router;
