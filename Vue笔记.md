@@ -407,7 +407,7 @@
   <info :value.sync="myValue"></info>
   ```
 
-+ 添加用户时,axios的参数要使用data,params参数会在url上,query
++ 添加用户时,axios的参数要使用data,params参数会在urlquery上,
 
   ```js
   export function addUser(userInfo) {
@@ -522,7 +522,7 @@
    v-for="item in haveRightChildren(scope.row.children) "
    ```
 
-4. 使用tree组件默认选中已分配的权限，使用递归向数组push已勾选的id值，**数据修改，但视图为发生改变**
+4. 使用tree组件默认选中已分配的权限，使用递归向数组push已勾选的id值，**数据修改，但视图未发生改变**
 
    ```vue
        <el-tree
@@ -733,20 +733,171 @@ nprogress
 
    + 在babel.config.js文件夹的plugins数组增加`'babel-plugin-transform-remove-console'`
 
-     ```
-     "plugins": [
+     ```js
+     const prodPlugins = []
+     // 判断是否属于生产环境
+     if (process.env.NODE_ENV === 'production') {
+       prodPlugins.push('transform-remove-console')
+     }
+     module.exports = {
+       "presets": [
+         "@vue/cli-plugin-babel/preset"
+       ],
+       "plugins": [
          [
-           "component",
+      "component",
            {
              "libraryName": "element-ui",
              "styleLibraryName": "theme-chalk"
            }
          ],
-         'babel-plugin-transform-remove-console'
+         // 如果是生产环境就添加transform-remove-console插件
+         ...prodPlugins
        ],
-     ```
-
      
+     }
+     ```
+     
+   
+2. 生成打包报告
 
+   1. 命令行`vue-cli-service bulid --report`
 
+   2. 在可视化面板ui中查看`vue ui`
+
+3. 通过chainWebpack自定义打包入口
+
+   1. 在vue.config.js中(如果没有需要创建)
+
+      ```js
+      module.exports = {
+      
+        chainWebpack: (config) => {
+          // 配置路径别名
+          config.resolve.alias
+            //set第一个参数：设置的别名，第二个参数：设置的路径
+            .set('@', resolve('./src'))
+            .set('components', resolve('./src/components'))
+            .set('assets', resolve('./src/assets'))
+            .set('views', resolve('./src/views'))
+            .set('network', resolve('./src/network'))
+            .set('util', resolve('./src/util'));
+          //注意 store 和 router 没必要配置
+          
+          // 生产环境
+          config.when(process.env.NODE_ENV === 'production', config => {
+            config.entry('app').clear().add('./src/main-prod.js')
+          })
+          // 开发环境
+          config.when(process.env.NODE_ENV === 'development', config => {
+            config.entry('app').clear().add('./src/main-dev.js')
+          })
+        }
+      };
+      ```
+
+   2. 将main.js复制一份，分别改为`main-dev.js`与`main-prod.js`
+
+4. 通过externals加载外部cdn资源
+
+   > 默认情况下，通过import语法导入的第三方依赖包，最终会被打包合并到同一个文件中，从而导致打包成功后，单文件体积过大的问题
+   >
+   > 为了解决上述问题，可以通过webpack的externals节点，来配置并加载外部的CDN资源。凡是声明在externals中的第三方依赖包，都不会被打包
+
+   配置代码
+
+   ```js
+   // 打包的时候当找到下面的包时，不会将他们打包，而是去全局window寻找相对应的包
+    config.set('externals', {
+           vue: 'Vue', // 'import Vue(变量名) from vue(包名)'
+           'vue-router': 'VueRouter', // 'import VueRouter from vue-router'
+           axios: 'axios',
+           loadsh: '_',
+           echarts: 'echarts',
+           nprogress: 'NProgress',
+           'vue-quill-editor': 'VueQuillEditor'
+         })
+   ```
+
+   同时，需要在public/index.html文件的头部，添加如下的cdn资源引用
+
+   ```html
+     <link rel="stylesheet" href="https://cdn.staticfile.org/quill/1.3.7/quill.core.min.css">
+     <link rel="stylesheet" href="https://cdn.staticfile.org/quill/1.3.7/quill.snow.min.css">
+     <link rel="stylesheet" href="https://cdn.staticfile.org/quill/1.3.7/quill.bubble.min.css">
+   ```
+
+   在删除对应的css文件(main-prod.js里面)
+
+   复制相应的cdnjs链接到index.html
+
+   ```html
+    <script src="https://cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.6/dist/vue-router.min.js"></script>
+     <script src="https://cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
+     <script src="https://cdn.staticfile.org/lodash.js/4.17.15/lodash.min.js"></script>
+     <script src="https://cdn.staticfile.org/echarts/4.7.0/echarts.min.js"></script>
+     <script src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js"></script>
+     <!-- 富文本编辑器 -->
+     <script src="https://cdn.staticfile.org/quill/1.3.7/quill.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/vue-quill-editor@3.0.6/dist/vue-quill-editor.min.js"></script>
+   ```
+
+   此时生产环境下运行项目会出错`[Uncaught TypeError: Cannot redefine property: $router](https://www.cnblogs.com/mengyouyouyou/p/10936171.html)`,原因是index下router与node_modules重复了
+
+   解决方法
+
+   　1. 去掉index.html中的vue-router.js文件的引入。如果没有使用externals的话可以直接使用这种方法。
+
+   　　2. 删除vue-router的依赖，包括依赖包和package.json中的vue-router。使用了externals来外部引入vue-router的话则用这种方法。
+
+5. 通过CDN优化ElementUI的打包
+
+   1. 在main-prod.js中，注释掉element-ui按需加载的代码
+
+   2. 在index.html的头部区域中，通过cdn加载element-ui的js和css样式
+
+      ```html
+      <link rel="stylesheet" href="https://cdn.staticfile.org/element-ui/2.13.2/theme-chalk/index.css">
+      <script src="https://cdn.staticfile.org/element-ui/2.13.2/index.js"></script>
+      ```
+
+6. 首页内容定制
+
+   1. 在vue.config.js中的chainWebpack中添加
+
+      ```js
+      // 生产环境
+      config.plugin("html").tap(args=>{
+        args[0].isProd = true
+        return args
+      })
+      
+      // 开发环境
+      config.plugin("html").tap(args=>{
+        args[0].isProd = false
+        return args
+      })
+      ```
+
+   2. 在public/index.html中可以通过`htmlWebpackPlugin.options.isProd`获取到定义的值，从而来判断是否使用CDN
+
+      ```html
+      <% if(htmlWebpackPlugin.options.isProd){ %>
+        <!-- 富文本编辑器样式 -->
+        <link rel="stylesheet" href="https://cdn.staticfile.org/quill/1.3.7/quill.core.min.css">
+        <script src="https://cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+        <% }%>
+      ```
+
+7. 开启gzip压缩文件体积
+
+8. 使用pm2管理应用
+
+   1. 在服务器中安装pm2:npm i pm2 -g
+   2. 启动项目:pm2 start 脚本 —name 自定义名称
+   3. 查看运行项目:pm2 ls
+   4. 重启项目:pm2 restart 自定义名称
+   5. 停止项目:pm2 stop 自定义名称
+   6. 删除项目:pm2 delete 自定义名称
 
